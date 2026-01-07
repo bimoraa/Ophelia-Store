@@ -11,6 +11,7 @@ interface Config {
     client_id:     string;
     database_url:  string;
     web_url:       string;
+    mongo_uri:     string;
 }
 
 /**
@@ -20,7 +21,8 @@ export const config: Config = {
     discord_token: process.env.DISCORD_TOKEN || '',
     client_id:     process.env.CLIENT_ID || '',
     database_url:  process.env.DATABASE_URL || '',
-    web_url:       process.env.WEB_URL || ''
+    web_url:       process.env.WEB_URL || '',
+    mongo_uri:     process.env.MONGO_URI || ''
 };
 
 /**

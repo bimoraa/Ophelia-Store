@@ -119,6 +119,17 @@ export const initialize_postgres_tables = async (): Promise<void> => {
             );
         `);
 
+        // - CREATE AUTO ROLE TABLE - \\
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS auto_roles (
+                id         SERIAL PRIMARY KEY,
+                guild_id   VARCHAR(255) UNIQUE NOT NULL,
+                role_id    VARCHAR(255) NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        `);
+
         console.log('[ - DATABASE - ] PostgreSQL tables initialized successfully');
     } catch (error) {
         await log_error('PostgreSQL Table Initialization Error', error as Error);
