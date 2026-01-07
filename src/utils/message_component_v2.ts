@@ -402,7 +402,7 @@ export function file(url: string): file_component {
  * @returns {message_payload} Component v2 payload
  */
 export function build_component_reply(
-  content: string | string[],
+   content: string | string[],
   image_url?: string,
   is_interaction: boolean = false
 ): message_payload {

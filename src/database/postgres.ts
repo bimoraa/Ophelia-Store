@@ -3,8 +3,8 @@
  */
 
 import { Pool, PoolClient } from 'pg';
-import { config } from '../config/environment';
-import { log_error } from '../utils/error_logger';
+import { config }           from '../config/environment';
+import { log_error }        from '../utils/error_logger';
 
 let pool: Pool | null = null;
 
