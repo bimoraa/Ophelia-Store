@@ -3,7 +3,7 @@
  */
 
 import { Client, Events, GuildMember, TextChannel } from 'discord.js';
-import { WelcomeSettings } from '../models/welcome_settings';
+import { get_welcome_settings } from '../models/welcome_settings';
 import { create_welcome_component, create_custom_welcome_component } from '../utils/welcome';
 import { log_error } from '../utils/error_logger';
 
@@ -17,9 +17,7 @@ export const register_guild_member_add_event = (client: Client): void => {
             console.log(`[ - MEMBER JOIN - ] ${member.user.tag} joined ${member.guild.name}`);
 
             // - GET WELCOME SETTINGS - \\
-            const welcome_settings = await WelcomeSettings.findOne({
-                guild_id: member.guild.id
-            });
+            const welcome_settings = await get_welcome_settings(member.guild.id);
 
             if (!welcome_settings || !welcome_settings.enabled) {
                 console.log(`[ - WELCOME - ] Welcome disabled for ${member.guild.name}`);

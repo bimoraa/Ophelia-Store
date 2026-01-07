@@ -6,7 +6,6 @@ import { GatewayIntentBits } from 'discord.js';
 import { join } from 'path';
 import { config, validate_config } from './config/environment';
 import { create_client } from './types/client';
-import { connect_mongodb } from './database/mongodb';
 import { initialize_postgres_tables } from './database/postgres';
 import { register_ready_event } from './events/ready';
 import { register_interaction_event } from './events/interaction_create';
@@ -40,7 +39,6 @@ const main = async (): Promise<void> => {
 
         // - CONNECT TO DATABASES - \\
         console.log('[ - INIT - ] Connecting to databases...');
-        await connect_mongodb();
         await initialize_postgres_tables();
 
         // - LOAD COMMANDS - \\

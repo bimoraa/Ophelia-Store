@@ -10,7 +10,12 @@ import {
     TextChannel
 } from 'discord.js';
 import { Command } from '../../../types/command';
-import { WelcomeSettings } from '../../../models/welcome_settings';
+import { 
+    get_welcome_settings, 
+    upsert_welcome_settings, 
+    update_welcome_enabled,
+    update_welcome_message 
+} from '../../../models/welcome_settings';
 import { create_success_embed, create_error_embed_simple, create_info_embed } from '../../../utils/embeds';
 import { log_error } from '../../../utils/error_logger';
 
@@ -83,16 +88,11 @@ const command: Command = {
             if (subcommand === 'setup') {
                 const channel = interaction.options.getChannel('channel', true) as TextChannel;
 
-                await WelcomeSettings.findOneAndUpdate(
-                    { guild_id: interaction.guildId },
-                    {
-                        guild_id:   interaction.guildId,
-                        channel_id: channel.id,
-                        enabled:    true,
-                        updated_at: new Date()
-                    },
-                    { upsert: true, new: true }
-                );
+                await upsert_welcome_settings({
+                    guild_id:   interaction.guildId,
+                    channel_id: channel.id,
+                    enabled:    true
+                });
 
                 await interaction.reply({
                     embeds:    [create_success_embed(`Welcome messages will be sent to ${channel}`)],
@@ -103,11 +103,7 @@ const command: Command = {
 
             // - DISABLE SUBCOMMAND - \\
             if (subcommand === 'disable') {
-                const settings = await WelcomeSettings.findOneAndUpdate(
-                    { guild_id: interaction.guildId },
-                    { enabled: false, updated_at: new Date() },
-                    { new: true }
-                );
+                const settings = await update_welcome_enabled(interaction.guildId, false);
 
                 if (!settings) {
                     await interaction.reply({
@@ -126,11 +122,7 @@ const command: Command = {
 
             // - ENABLE SUBCOMMAND - \\
             if (subcommand === 'enable') {
-                const settings = await WelcomeSettings.findOneAndUpdate(
-                    { guild_id: interaction.guildId },
-                    { enabled: true, updated_at: new Date() },
-                    { new: true }
-                );
+                const settings = await update_welcome_enabled(interaction.guildId, true);
 
                 if (!settings) {
                     await interaction.reply({
@@ -151,11 +143,7 @@ const command: Command = {
             if (subcommand === 'message') {
                 const custom_message = interaction.options.getString('text', true);
 
-                const settings = await WelcomeSettings.findOneAndUpdate(
-                    { guild_id: interaction.guildId },
-                    { custom_message: custom_message, updated_at: new Date() },
-                    { new: true }
-                );
+                const settings = await update_welcome_message(interaction.guildId, custom_message);
 
                 if (!settings) {
                     await interaction.reply({
@@ -174,7 +162,7 @@ const command: Command = {
 
             // - TEST SUBCOMMAND - \\
             if (subcommand === 'test') {
-                const settings = await WelcomeSettings.findOne({ guild_id: interaction.guildId });
+                const settings = await get_welcome_settings(interaction.guildId);
 
                 if (!settings) {
                     await interaction.reply({
@@ -243,7 +231,7 @@ const command: Command = {
 
             // - INFO SUBCOMMAND - \\
             if (subcommand === 'info') {
-                const settings = await WelcomeSettings.findOne({ guild_id: interaction.guildId });
+                const settings = await get_welcome_settings(interaction.guildId);
 
                 if (!settings) {
                     await interaction.reply({
