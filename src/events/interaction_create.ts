@@ -7,6 +7,7 @@ import { ExtendedClient } from '../types/client';
 import { log_error } from '../utils/error_logger';
 import { handle_button_interaction } from '../controllers/button_controller';
 import { handle_select_menu_interaction } from '../controllers/select_menu_controller';
+import { create_simple_message } from '../utils/message_component_v2';
 
 /**
  * @param {Client} client - Discord client instance
@@ -36,14 +37,14 @@ export const register_interaction_event = (client: Client): void => {
                 });
 
                 const error_message = {
-                    content:   'There was an error while executing this command!',
-                    ephemeral: true
+                    ...create_simple_message('❌ There was an error while executing this command!'),
+                    flags: 64
                 };
 
                 if (interaction.replied || interaction.deferred) {
-                    await interaction.followUp(error_message);
+                    await interaction.followUp(error_message as any);
                 } else {
-                    await interaction.reply(error_message);
+                    await interaction.reply(error_message as any);
                 }
             }
         }

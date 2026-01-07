@@ -3,7 +3,7 @@
  */
 
 import { ButtonInteraction } from 'discord.js';
-import { create_success_embed, create_error_embed_simple } from '../utils/embeds';
+import { create_simple_message } from '../utils/message_component_v2';
 import { log_error } from '../utils/error_logger';
 
 /**
@@ -19,33 +19,33 @@ export const handle_button_interaction = async (
         // - EXAMPLE BUTTON HANDLERS - \\
         if (customId === 'example_primary') {
             await interaction.reply({
-                embeds:    [create_success_embed('You clicked Primary button!')],
-                ephemeral: true
-            });
+                ...create_simple_message('✅ You clicked Primary button!'),
+                flags: 64
+            } as any);
             return;
         }
 
         if (customId === 'example_success') {
             await interaction.reply({
-                embeds:    [create_success_embed('You clicked Success button!')],
-                ephemeral: true
-            });
+                ...create_simple_message('✅ You clicked Success button!'),
+                flags: 64
+            } as any);
             return;
         }
 
         if (customId === 'example_danger') {
             await interaction.reply({
-                embeds:    [create_success_embed('You clicked Danger button!')],
-                ephemeral: true
-            });
+                ...create_simple_message('✅ You clicked Danger button!'),
+                flags: 64
+            } as any);
             return;
         }
 
         // - UNKNOWN BUTTON - \\
         await interaction.reply({
-            embeds:    [create_error_embed_simple('Unknown button interaction')],
-            ephemeral: true
-        });
+            ...create_simple_message('❌ Unknown button interaction'),
+            flags: 64
+        } as any);
 
     } catch (error) {
         await log_error('Button Interaction Error', error as Error, {
@@ -55,9 +55,9 @@ export const handle_button_interaction = async (
 
         if (!interaction.replied && !interaction.deferred) {
             await interaction.reply({
-                embeds:    [create_error_embed_simple('An error occurred while processing your request')],
-                ephemeral: true
-            });
+                ...create_simple_message('❌ An error occurred while processing your request'),
+                flags: 64
+            } as any);
         }
     }
 };

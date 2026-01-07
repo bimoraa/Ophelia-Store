@@ -3,7 +3,7 @@
  */
 
 import { StringSelectMenuInteraction } from 'discord.js';
-import { create_success_embed, create_error_embed_simple } from '../utils/embeds';
+import { create_simple_message } from '../utils/message_component_v2';
 import { log_error } from '../utils/error_logger';
 
 /**
@@ -21,17 +21,17 @@ export const handle_select_menu_interaction = async (
             const selected_value = values[0];
             
             await interaction.reply({
-                embeds:    [create_success_embed(`You selected: ${selected_value}`)],
-                ephemeral: true
-            });
+                ...create_simple_message(`✅ You selected: ${selected_value}`),
+                flags: 64
+            } as any);
             return;
         }
 
         // - UNKNOWN SELECT MENU - \\
         await interaction.reply({
-            embeds:    [create_error_embed_simple('Unknown select menu interaction')],
-            ephemeral: true
-        });
+            ...create_simple_message('❌ Unknown select menu interaction'),
+            flags: 64
+        } as any);
 
     } catch (error) {
         await log_error('Select Menu Interaction Error', error as Error, {
@@ -42,9 +42,9 @@ export const handle_select_menu_interaction = async (
 
         if (!interaction.replied && !interaction.deferred) {
             await interaction.reply({
-                embeds:    [create_error_embed_simple('An error occurred while processing your request')],
-                ephemeral: true
-            });
+                ...create_simple_message('❌ An error occurred while processing your request'),
+                flags: 64
+            } as any);
         }
     }
 };

@@ -4,7 +4,7 @@
 
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { Command } from '../../../types/command';
-import { create_embed } from '../../../utils/embeds';
+import { create_simple_message } from '../../../utils/message_component_v2';
 
 const command: Command = {
     data: new SlashCommandBuilder()
@@ -16,36 +16,17 @@ const command: Command = {
      * @returns {Promise<void>} Executes ping command
      */
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const sent = await interaction.reply({
-            content:   'Pinging...',
-            fetchReply: true
-        });
+        await interaction.reply(create_simple_message('Pinging...') as any);
 
+        const sent        = await interaction.fetchReply();
         const latency     = sent.createdTimestamp - interaction.createdTimestamp;
         const api_latency = Math.round(interaction.client.ws.ping);
 
-        const embed = create_embed({
-            title:       'Pong',
-            description: 'Bot latency information',
-            color:       0x00FF00,
-            fields:      [
-                {
-                    name:   'Roundtrip Latency',
-                    value:  `${latency}ms`,
-                    inline: true
-                },
-                {
-                    name:   'WebSocket Latency',
-                    value:  `${api_latency}ms`,
-                    inline: true
-                }
-            ]
-        });
+        const message = create_simple_message(
+            `## Pong\n\n**Roundtrip Latency:** ${latency}ms\n**WebSocket Latency:** ${api_latency}ms`
+        );
 
-        await interaction.editReply({
-            content: '',
-            embeds:  [embed]
-        });
+        await interaction.editReply(message as any);
     }
 };
 

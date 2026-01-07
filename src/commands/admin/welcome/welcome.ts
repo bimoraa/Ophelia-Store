@@ -16,7 +16,7 @@ import {
     update_welcome_enabled,
     update_welcome_message 
 } from '../../../models/welcome_settings';
-import { create_success_embed, create_error_embed_simple, create_info_embed } from '../../../utils/embeds';
+import { create_simple_message } from '../../../utils/message_component_v2';
 import { log_error } from '../../../utils/error_logger';
 
 const command: Command = {
@@ -75,9 +75,9 @@ const command: Command = {
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         if (!interaction.guildId) {
             await interaction.reply({
-                embeds:    [create_error_embed_simple('This command can only be used in a server!')],
-                ephemeral: true
-            });
+                ...create_simple_message('❌ This command can only be used in a server!'),
+                flags: 64
+            } as any);
             return;
         }
 
@@ -95,9 +95,9 @@ const command: Command = {
                 });
 
                 await interaction.reply({
-                    embeds:    [create_success_embed(`Welcome messages will be sent to ${channel}`)],
-                    ephemeral: true
-                });
+                    ...create_simple_message(`✅ Welcome messages will be sent to ${channel}`),
+                    flags: 64
+                } as any);
                 return;
             }
 
@@ -107,16 +107,16 @@ const command: Command = {
 
                 if (!settings) {
                     await interaction.reply({
-                        embeds:    [create_error_embed_simple('Welcome system is not configured yet. Use `/welcome setup` first.')],
-                        ephemeral: true
-                    });
+                        ...create_simple_message('❌ Welcome system is not configured yet. Use `/welcome setup` first.'),
+                        flags: 64
+                    } as any);
                     return;
                 }
 
                 await interaction.reply({
-                    embeds:    [create_success_embed('Welcome messages have been disabled')],
-                    ephemeral: true
-                });
+                    ...create_simple_message('✅ Welcome messages have been disabled'),
+                    flags: 64
+                } as any);
                 return;
             }
 
@@ -126,16 +126,16 @@ const command: Command = {
 
                 if (!settings) {
                     await interaction.reply({
-                        embeds:    [create_error_embed_simple('Welcome system is not configured yet. Use `/welcome setup` first.')],
-                        ephemeral: true
-                    });
+                        ...create_simple_message('❌ Welcome system is not configured yet. Use `/welcome setup` first.'),
+                        flags: 64
+                    } as any);
                     return;
                 }
 
                 await interaction.reply({
-                    embeds:    [create_success_embed('Welcome messages have been enabled')],
-                    ephemeral: true
-                });
+                    ...create_simple_message('✅ Welcome messages have been enabled'),
+                    flags: 64
+                } as any);
                 return;
             }
 
@@ -147,16 +147,16 @@ const command: Command = {
 
                 if (!settings) {
                     await interaction.reply({
-                        embeds:    [create_error_embed_simple('Welcome system is not configured yet. Use `/welcome setup` first.')],
-                        ephemeral: true
-                    });
+                        ...create_simple_message('❌ Welcome system is not configured yet. Use `/welcome setup` first.'),
+                        flags: 64
+                    } as any);
                     return;
                 }
 
                 await interaction.reply({
-                    embeds:    [create_success_embed('Custom welcome message has been set!\n\nPreview:\n' + custom_message)],
-                    ephemeral: true
-                });
+                    ...create_simple_message('✅ Custom welcome message has been set!\n\n**Preview:**\n' + custom_message),
+                    flags: 64
+                } as any);
                 return;
             }
 
@@ -166,9 +166,9 @@ const command: Command = {
 
                 if (!settings) {
                     await interaction.reply({
-                        embeds:    [create_error_embed_simple('Welcome system is not configured yet. Use `/welcome setup` first.')],
-                        ephemeral: true
-                    });
+                        ...create_simple_message('❌ Welcome system is not configured yet. Use `/welcome setup` first.'),
+                        flags: 64
+                    } as any);
                     return;
                 }
 
@@ -176,9 +176,9 @@ const command: Command = {
                 
                 if (!channel) {
                     await interaction.reply({
-                        embeds:    [create_error_embed_simple('Welcome channel not found!')],
-                        ephemeral: true
-                    });
+                        ...create_simple_message('❌ Welcome channel not found!'),
+                        flags: 64
+                    } as any);
                     return;
                 }
 
@@ -223,9 +223,9 @@ const command: Command = {
                 await channel.send(component_data as any);
 
                 await interaction.reply({
-                    embeds:    [create_success_embed(`Test welcome message sent to ${channel}`)],
-                    ephemeral: true
-                });
+                    ...create_simple_message(`✅ Test welcome message sent to ${channel}`),
+                    flags: 64
+                } as any);
                 return;
             }
 
@@ -235,28 +235,22 @@ const command: Command = {
 
                 if (!settings) {
                     await interaction.reply({
-                        embeds:    [create_error_embed_simple('Welcome system is not configured yet. Use `/welcome setup` first.')],
-                        ephemeral: true
-                    });
+                        ...create_simple_message('❌ Welcome system is not configured yet. Use `/welcome setup` first.'),
+                        flags: 64
+                    } as any);
                     return;
                 }
 
                 const channel      = await interaction.guild?.channels.fetch(settings.channel_id);
-                const status       = settings.enabled ? 'Enabled' : 'Disabled';
+                const status       = settings.enabled ? '✅ Enabled' : '❌ Disabled';
                 const custom_msg   = settings.custom_message || 'Default message';
 
-                const info_embed = create_info_embed('');
-                info_embed.setTitle('Welcome Settings');
-                info_embed.addFields([
-                    { name: 'Status', value: status, inline: true },
-                    { name: 'Channel', value: channel ? `<#${channel.id}>` : 'Not found', inline: true },
-                    { name: 'Custom Message', value: custom_msg, inline: false }
-                ]);
+                const info_text = `## Welcome Settings\n\n**Status:** ${status}\n**Channel:** ${channel ? `<#${channel.id}>` : 'Not found'}\n**Custom Message:**\n${custom_msg}`;
 
                 await interaction.reply({
-                    embeds:    [info_embed],
-                    ephemeral: true
-                });
+                    ...create_simple_message(info_text),
+                    flags: 64
+                } as any);
                 return;
             }
 
@@ -268,9 +262,9 @@ const command: Command = {
             });
 
             await interaction.reply({
-                embeds:    [create_error_embed_simple('An error occurred while processing the command')],
-                ephemeral: true
-            });
+                ...create_simple_message('❌ An error occurred while processing the command'),
+                flags: 64
+            } as any);
         }
     }
 };

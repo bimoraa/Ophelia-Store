@@ -4,7 +4,7 @@
 
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { Command } from '../../../types/command';
-import { create_embed } from '../../../utils/embeds';
+import { create_simple_message } from '../../../utils/message_component_v2';
 import { ExtendedClient } from '../../../types/client';
 
 const command: Command = {
@@ -20,21 +20,18 @@ const command: Command = {
         const client   = interaction.client as ExtendedClient;
         const commands = Array.from(client.commands.values());
 
-        const embed = create_embed({
-            title:       'Available Commands',
-            description: 'List of all commands available in Ophelia Store Bot',
-            color:       0x5865F2,
-            fields:      commands.map(cmd => ({
-                name:   `/${cmd.data.name}`,
-                value:  cmd.data.description,
-                inline: false
-            }))
-        });
+        const commands_text = commands
+            .map(cmd => `**/${cmd.data.name}**\n${cmd.data.description}`)
+            .join('\n\n');
+
+        const message = create_simple_message(
+            `## Available Commands\n\nList of all commands available in Ophelia Store Bot\n\n${commands_text}`
+        );
 
         await interaction.reply({
-            embeds:    [embed],
-            ephemeral: true
-        });
+            ...message,
+            flags: 64
+        } as any);
     }
 };
 

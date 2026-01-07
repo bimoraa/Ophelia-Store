@@ -8,7 +8,7 @@ import {
     ButtonStyle 
 } from 'discord.js';
 import { Command } from '../../../types/command';
-import { create_embed } from '../../../utils/embeds';
+import { create_simple_message } from '../../../utils/message_component_v2';
 import { create_button_row, create_select_menu_row } from '../../../utils/components';
 
 const command: Command = {
@@ -21,11 +21,9 @@ const command: Command = {
      * @returns {Promise<void>} Executes example command with components v2
      */
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const embed = create_embed({
-            title:       'Component v2 Example',
-            description: 'This is an example showing proper Discord.js v14 Component v2 usage',
-            color:       0x5865F2
-        });
+        const message = create_simple_message(
+            '## Component v2 Example\n\nThis is an example showing proper Discord.js v14 Component v2 usage with buttons and select menus'
+        );
 
         // - EXAMPLE BUTTON ROW - \\
         const button_row = create_button_row([
@@ -70,7 +68,7 @@ const command: Command = {
         });
 
         await interaction.reply({
-            embeds:     [embed],
+            ...message,
             components: [button_row, select_row]
         });
     }
