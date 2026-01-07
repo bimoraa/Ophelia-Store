@@ -3,12 +3,7 @@
  */
 
 import { GuildMember } from 'discord.js';
-import { create_component_v2 } from './message_component_v2';
-
-interface WelcomeComponentData {
-    flags:      number;
-    components: any[];
-}
+import { build_component_reply, message_payload } from './message_component_v2';
 
 /**
  * @param {GuildMember} member - Guild member who joined
@@ -18,19 +13,11 @@ interface WelcomeComponentData {
 export const create_welcome_component = (
     member:      GuildMember,
     server_name: string
-): WelcomeComponentData => {
+): message_payload => {
     const avatar_url = member.user.displayAvatarURL({ size: 256 });
     const content    = `## Welcome!\n<@${member.id}>, you've just joined ${server_name}.\nWe're glad to have you here.`;
-    
-    return create_component_v2()
-        .add_container(container => {
-            container.add_section(section => {
-                section
-                    .add_text(content)
-                    .add_media(avatar_url);
-            });
-        })
-        .build();
+
+    return build_component_reply(content, avatar_url);
 };
 
 /**
@@ -43,20 +30,12 @@ export const create_custom_welcome_component = (
     member:         GuildMember,
     server_name:    string,
     custom_message: string
-): WelcomeComponentData => {
+): message_payload => {
     const avatar_url = member.user.displayAvatarURL({ size: 256 });
     const content    = custom_message
         .replace('{user}', `<@${member.id}>`)
         .replace('{server}', server_name)
         .replace('{username}', member.user.username);
-    
-    return create_component_v2()
-        .add_container(container => {
-            container.add_section(section => {
-                section
-                    .add_text(content)
-                    .add_media(avatar_url);
-            });
-        })
-        .build();
+
+    return build_component_reply(content, avatar_url);
 };

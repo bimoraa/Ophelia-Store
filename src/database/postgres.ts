@@ -104,6 +104,21 @@ export const initialize_postgres_tables = async (): Promise<void> => {
             );
         `);
 
+        // - CREATE SERVER STATS TABLE - \\
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS server_stats (
+                id          SERIAL PRIMARY KEY,
+                guild_id    VARCHAR(255) NOT NULL,
+                channel_id  VARCHAR(255) NOT NULL,
+                stat_type   VARCHAR(50) NOT NULL,
+                text_format TEXT NOT NULL,
+                enabled     BOOLEAN DEFAULT TRUE,
+                created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(guild_id, channel_id)
+            );
+        `);
+
         console.log('[ - DATABASE - ] PostgreSQL tables initialized successfully');
     } catch (error) {
         await log_error('PostgreSQL Table Initialization Error', error as Error);

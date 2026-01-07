@@ -16,7 +16,7 @@ import {
     update_welcome_enabled,
     update_welcome_message 
 } from '../../../models/welcome_settings';
-import { create_simple_message } from '../../../utils/message_component_v2';
+import { build_component_reply } from '../../../utils/message_component_v2';
 import { log_error } from '../../../utils/error_logger';
 
 const command: Command = {
@@ -74,10 +74,9 @@ const command: Command = {
      */
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         if (!interaction.guildId) {
-            await interaction.reply({
-                ...create_simple_message('❌ This command can only be used in a server!'),
-                flags: 64
-            } as any);
+            await interaction.reply(
+                build_component_reply('❌ This command can only be used in a server!', undefined, true) as any
+            );
             return;
         }
 
@@ -94,10 +93,9 @@ const command: Command = {
                     enabled:    true
                 });
 
-                await interaction.reply({
-                    ...create_simple_message(`✅ Welcome messages will be sent to ${channel}`),
-                    flags: 64
-                } as any);
+                await interaction.reply(
+                    build_component_reply(`✅ Welcome messages will be sent to ${channel}`, undefined, true) as any
+                );
                 return;
             }
 
@@ -106,17 +104,15 @@ const command: Command = {
                 const settings = await update_welcome_enabled(interaction.guildId, false);
 
                 if (!settings) {
-                    await interaction.reply({
-                        ...create_simple_message('❌ Welcome system is not configured yet. Use `/welcome setup` first.'),
-                        flags: 64
-                    } as any);
+                    await interaction.reply(
+                        build_component_reply('❌ Welcome system is not configured yet. Use `/welcome setup` first.', undefined, true) as any
+                    );
                     return;
                 }
 
-                await interaction.reply({
-                    ...create_simple_message('✅ Welcome messages have been disabled'),
-                    flags: 64
-                } as any);
+                await interaction.reply(
+                    build_component_reply('✅ Welcome messages have been disabled', undefined, true) as any
+                );
                 return;
             }
 
@@ -125,17 +121,15 @@ const command: Command = {
                 const settings = await update_welcome_enabled(interaction.guildId, true);
 
                 if (!settings) {
-                    await interaction.reply({
-                        ...create_simple_message('❌ Welcome system is not configured yet. Use `/welcome setup` first.'),
-                        flags: 64
-                    } as any);
+                    await interaction.reply(
+                        build_component_reply('❌ Welcome system is not configured yet. Use `/welcome setup` first.', undefined, true) as any
+                    );
                     return;
                 }
 
-                await interaction.reply({
-                    ...create_simple_message('✅ Welcome messages have been enabled'),
-                    flags: 64
-                } as any);
+                await interaction.reply(
+                    build_component_reply('✅ Welcome messages have been enabled', undefined, true) as any
+                );
                 return;
             }
 
@@ -146,17 +140,21 @@ const command: Command = {
                 const settings = await update_welcome_message(interaction.guildId, custom_message);
 
                 if (!settings) {
-                    await interaction.reply({
-                        ...create_simple_message('❌ Welcome system is not configured yet. Use `/welcome setup` first.'),
-                        flags: 64
-                    } as any);
+                    await interaction.reply(
+                        build_component_reply('❌ Welcome system is not configured yet. Use `/welcome setup` first.', undefined, true) as any
+                    );
                     return;
                 }
 
-                await interaction.reply({
-                    ...create_simple_message('✅ Custom welcome message has been set!\n\n**Preview:**\n' + custom_message),
-                    flags: 64
-                } as any);
+                await interaction.reply(
+                    build_component_reply(
+                        "✅ Custom welcome message has been set!\n\n" +
+                        "**Preview:**\n" +
+                        custom_message,
+                        undefined,
+                        true
+                    ) as any
+                );
                 return;
             }
 
@@ -165,20 +163,18 @@ const command: Command = {
                 const settings = await get_welcome_settings(interaction.guildId);
 
                 if (!settings) {
-                    await interaction.reply({
-                        ...create_simple_message('❌ Welcome system is not configured yet. Use `/welcome setup` first.'),
-                        flags: 64
-                    } as any);
+                    await interaction.reply(
+                        build_component_reply('❌ Welcome system is not configured yet. Use `/welcome setup` first.', undefined, true) as any
+                    );
                     return;
                 }
 
                 const channel = await interaction.guild?.channels.fetch(settings.channel_id) as TextChannel;
                 
                 if (!channel) {
-                    await interaction.reply({
-                        ...create_simple_message('❌ Welcome channel not found!'),
-                        flags: 64
-                    } as any);
+                    await interaction.reply(
+                        build_component_reply('❌ Welcome channel not found!', undefined, true) as any
+                    );
                     return;
                 }
 
@@ -187,45 +183,22 @@ const command: Command = {
                 const server_name  = interaction.guild?.name || 'Server';
                 
                 let message_content = settings.custom_message || 
-                    `## Welcome!\n<@${interaction.user.id}>, you've just joined ${server_name}.\nWe're glad to have you here.`;
+                    "## Welcome!\n" +
+                    `<@${interaction.user.id}>, you've just joined ${server_name}.\n` +
+                    "We're glad to have you here.";
                 
                 message_content = message_content
                     .replace('{user}', `<@${interaction.user.id}>`)
                     .replace('{server}', server_name)
                     .replace('{username}', interaction.user.username);
 
-                const component_data = {
-                    flags:      32768,
-                    components: [
-                        {
-                            type:       17,
-                            components: [
-                                {
-                                    type:       9,
-                                    components: [
-                                        {
-                                            type:    10,
-                                            content: message_content
-                                        }
-                                    ],
-                                    accessory: {
-                                        type:  11,
-                                        media: {
-                                            url: avatar_url
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    ]
-                };
+                await channel.send(
+                    build_component_reply(message_content, avatar_url) as any
+                );
 
-                await channel.send(component_data as any);
-
-                await interaction.reply({
-                    ...create_simple_message(`✅ Test welcome message sent to ${channel}`),
-                    flags: 64
-                } as any);
+                await interaction.reply(
+                    build_component_reply(`✅ Test welcome message sent to ${channel}`, undefined, true) as any
+                );
                 return;
             }
 
@@ -234,10 +207,9 @@ const command: Command = {
                 const settings = await get_welcome_settings(interaction.guildId);
 
                 if (!settings) {
-                    await interaction.reply({
-                        ...create_simple_message('❌ Welcome system is not configured yet. Use `/welcome setup` first.'),
-                        flags: 64
-                    } as any);
+                    await interaction.reply(
+                        build_component_reply('❌ Welcome system is not configured yet. Use `/welcome setup` first.', undefined, true) as any
+                    );
                     return;
                 }
 
@@ -245,12 +217,16 @@ const command: Command = {
                 const status       = settings.enabled ? '✅ Enabled' : '❌ Disabled';
                 const custom_msg   = settings.custom_message || 'Default message';
 
-                const info_text = `## Welcome Settings\n\n**Status:** ${status}\n**Channel:** ${channel ? `<#${channel.id}>` : 'Not found'}\n**Custom Message:**\n${custom_msg}`;
+                const info_text = 
+                    "## Welcome Settings\n\n" +
+                    `**Status:** ${status}\n` +
+                    `**Channel:** ${channel ? `<#${channel.id}>` : 'Not found'}\n` +
+                    "**Custom Message:**\n" +
+                    custom_msg;
 
-                await interaction.reply({
-                    ...create_simple_message(info_text),
-                    flags: 64
-                } as any);
+                await interaction.reply(
+                    build_component_reply(info_text, undefined, true) as any
+                );
                 return;
             }
 
@@ -261,10 +237,9 @@ const command: Command = {
                 user:       interaction.user.tag
             });
 
-            await interaction.reply({
-                ...create_simple_message('❌ An error occurred while processing the command'),
-                flags: 64
-            } as any);
+            await interaction.reply(
+                build_component_reply('❌ An error occurred while processing the command', undefined, true) as any
+            );
         }
     }
 };

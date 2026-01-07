@@ -4,7 +4,7 @@
 
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { Command } from '../../../types/command';
-import { create_simple_message } from '../../../utils/message_component_v2';
+import { build_component_reply } from '../../../utils/message_component_v2';
 
 const command: Command = {
     data: new SlashCommandBuilder()
@@ -16,17 +16,21 @@ const command: Command = {
      * @returns {Promise<void>} Executes ping command
      */
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        await interaction.reply(create_simple_message('Pinging...') as any);
+        await interaction.reply(build_component_reply('Pinging...', undefined, true) as any);
 
         const sent        = await interaction.fetchReply();
         const latency     = sent.createdTimestamp - interaction.createdTimestamp;
         const api_latency = Math.round(interaction.client.ws.ping);
 
-        const message = create_simple_message(
-            `## Pong\n\n**Roundtrip Latency:** ${latency}ms\n**WebSocket Latency:** ${api_latency}ms`
+        await interaction.editReply(
+            build_component_reply(
+                "## Pong\n\n" +
+                `- **Roundtrip Latency:** ${latency}ms\n` +
+                `- **WebSocket Latency:** ${api_latency}ms`,
+                undefined,
+                true
+            ) as any
         );
-
-        await interaction.editReply(message as any);
     }
 };
 

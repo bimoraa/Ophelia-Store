@@ -4,7 +4,7 @@
 
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { Command } from '../../../types/command';
-import { create_simple_message } from '../../../utils/message_component_v2';
+import { build_component_reply } from '../../../utils/message_component_v2';
 import { ExtendedClient } from '../../../types/client';
 
 const command: Command = {
@@ -24,14 +24,15 @@ const command: Command = {
             .map(cmd => `**/${cmd.data.name}**\n${cmd.data.description}`)
             .join('\n\n');
 
-        const message = create_simple_message(
-            `## Available Commands\n\nList of all commands available in Ophelia Store Bot\n\n${commands_text}`
+        await interaction.reply(
+            build_component_reply(
+                "## Available Commands\n\n" +
+                "List of all commands available in Ophelia Store Bot\n\n" +
+                commands_text,
+                undefined,
+                true
+            ) as any
         );
-
-        await interaction.reply({
-            ...message,
-            flags: 64
-        } as any);
     }
 };
 
