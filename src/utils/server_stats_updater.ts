@@ -21,11 +21,18 @@ const get_count_by_type = (
         case 'ALL_MEMBERS':
             return guild.memberCount ?? guild.approximateMemberCount ?? 0;
         
-        case 'MEMBERS':
+        case 'MEMBERS': {
             if (member_entries) {
                 return member_entries.filter(m => !m.user.bot).size;
             }
-            return guild.members.cache.filter(m => !m.user.bot).size;
+
+            const cached_bot_count = guild.members.cache.filter(m => m.user.bot).size;
+            const total_members    = guild.memberCount ?? guild.approximateMemberCount ?? 0;
+            const fallback_count   = Math.max(total_members - cached_bot_count, 0);
+            const cached_members   = guild.members.cache.filter(m => !m.user.bot).size;
+
+            return fallback_count > 0 ? fallback_count : cached_members;
+        }
         
         case 'SERVER_BOOST':
             return guild.premiumSubscriptionCount || 0;

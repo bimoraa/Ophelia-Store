@@ -55,7 +55,7 @@ const command: Command = {
             return;
         }
 
-        await interaction.deferReply({ ephemeral: true });
+        await interaction.deferReply({ flags: 64 });
 
         try {
             // - FETCH MEMBERS AND ASSIGN ROLE - \

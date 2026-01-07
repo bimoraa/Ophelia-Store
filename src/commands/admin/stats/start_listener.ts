@@ -57,7 +57,7 @@ const command: Command = {
             return;
         }
 
-        await interaction.deferReply({ ephemeral: true });
+        await interaction.deferReply({ flags: 64 });
 
         try {
             const stat_type   = interaction.options.getString('type', true) as 'ALL_MEMBERS' | 'MEMBERS' | 'SERVER_BOOST';
